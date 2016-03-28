@@ -3,7 +3,7 @@ import io.getquill.naming.SnakeCase
 import io.getquill.sources.sql.idiom.H2Dialect
 import com.typesafe.config.ConfigFactory
 
-case class TestData(id: Int, value: Option[Int])
+case class TestData(id: Int, optionValue: Option[Int])
 
 object FindByOption {
 
@@ -29,14 +29,7 @@ object FindByOption {
 
   val qFindByOption = quote { (o: Option[Int]) =>
     query[TestData]
-      .filter(_.value == o)
-  }
-
-  val qFindByNone = quote {
-    query[TestData]
-      .filter(_.value.isEmpty)
-    // possible bug: camel case not converted to snake case (rename the property to optionValue to see this):
-    // SELECT x3.id, x3.option_value FROM test_data x3 WHERE x3.optionValue IS NULL
+      .filter(t => if(o.isDefined) t.optionValue == o else t.optionValue.isEmpty)
   }
 
   def create(testData: TestData): Unit =
@@ -47,14 +40,6 @@ object FindByOption {
 
   def findByOption(o: Option[Int]): Seq[TestData] =
     db.run(qFindByOption)(o)
-    // possible bug: NULL check using = does not work in h2 / mysql:
-    // SELECT x2.id, x2.value FROM test_data x2 WHERE x2.value = ?
-
-  def findByOptionWorkaround(o: Option[Int]): Seq[TestData] =
-    if(o.isDefined)
-      db.run(qFindByOption)(o)
-    else
-      db.run(qFindByNone)
 
 }
 

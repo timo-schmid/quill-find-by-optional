@@ -7,13 +7,12 @@ object FindByOptionSpec extends Specification {
   val find                    = FindByOption.findById _
   val create                  = FindByOption.create _
   val findByOption            = FindByOption.findByOption _
-  val findByOptionWorkaround  = FindByOption.findByOptionWorkaround _
 
   step {
     db.execute(
       """ CREATE TABLE IF NOT EXISTS test_data (
         |   id INT AUTO_INCREMENT,
-        |   value INT
+        |   option_value INT
         |)
         |""".stripMargin,
       None
@@ -35,11 +34,6 @@ object FindByOptionSpec extends Specification {
 
     "be able to find by None" in {
       val result = findByOption(None) // returns Seq() instead of Seq(TestData(5, None), TestData(6, None))
-      result.size must equalTo(2)
-    }
-
-    "be able to find by None using workaround" in {
-      val result = findByOptionWorkaround(None)
       result.size must equalTo(2)
     }
 
