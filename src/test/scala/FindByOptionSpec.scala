@@ -15,6 +15,7 @@ object FindByOptionSpec extends Specification {
         |   option_value INT
         |)
         |""".stripMargin,
+      x => x,
       None
     )
     if(find(1).isEmpty) create(TestData(1, Some(1)))
